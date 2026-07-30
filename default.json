@@ -59,6 +59,15 @@
         "registry.redhat.io/ubi9/ubi"
       ],
       "allowedVersions": "/^9\\.4-[\\d.]+$/"
+    },
+    {
+      "description": "package-rules: allow Red Hat image updates with large build ID increments",
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": [
+        "^registry\\.access\\.redhat\\.com/",
+        "^registry\\.redhat\\.io/"
+      ],
+      "maxMajorIncrement": 0
     }
   ],
   "tekton": {
