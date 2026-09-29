@@ -12,6 +12,7 @@ renovate-config/
 ├── package-rules.json
 ├── base-images.json                     # Base image update detection
 ├── konflux.json                         # Tool-specific preset
+├── gitlab-author.json                   # GitLab-only commit author
 ├── gitlab-approvals.json                # GitLab approval rules compatibility
 ├── rhaiis/
 │   └── rhaiis.json                        # Product-level presets
@@ -29,6 +30,7 @@ renovate-config/
 - **`dependency-patterns.json`** - Standard dependency matching patterns
 - **`base-images.json`** - Base image update detection for teams consuming AIPCC base images from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access`
 - **`konflux.json`** - Konflux CI/CD tooling configurations
+- **`gitlab-author.json`** - GitLab-only AIPCC CICD Bot commit author (opt in on GitLab)
 - **`gitlab-approvals.json`** - GitLab approval rules compatibility (use for repos with non-author approval enforcement)
 
 ### **Product Level**
@@ -116,6 +118,21 @@ Repositories that enforce non-author approval on merge requests should extend th
   ]
 }
 ```
+
+### **GitLab Repository Using the AIPCC CICD Bot Author**
+The default preset leaves `gitAuthor` unset so GitHub App runs can discover their own commit author. GitLab repositories that need the existing AIPCC CICD Bot author must explicitly extend the GitLab-only preset:
+
+```json
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "github>opendatahub-io/renovate-config",
+    "github>opendatahub-io/renovate-config//gitlab-author"
+  ]
+}
+```
+
+Do not extend `gitlab-author` on GitHub App repositories. Existing GitLab consumers must opt in to preserve their previous commit author. This preset can be combined with `gitlab-approvals` when needed.
 
 ## Branch Strategies
 
