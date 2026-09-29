@@ -12,7 +12,6 @@ renovate-config/
 ├── package-rules.json
 ├── base-images.json                     # Base image update detection
 ├── konflux.json                         # Tool-specific preset
-├── gitlab-author.json                   # GitLab-only commit author
 ├── gitlab-approvals.json                # GitLab approval rules compatibility
 ├── rhaiis/
 │   └── rhaiis.json                        # Product-level presets
@@ -30,7 +29,6 @@ renovate-config/
 - **`dependency-patterns.json`** - Standard dependency matching patterns
 - **`base-images.json`** - Base image update detection for teams consuming AIPCC base images from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access`
 - **`konflux.json`** - Konflux CI/CD tooling configurations
-- **`gitlab-author.json`** - GitLab-only AIPCC CICD Bot commit author (opt in on GitLab)
 - **`gitlab-approvals.json`** - GitLab approval rules compatibility (use for repos with non-author approval enforcement)
 
 ### **Product Level**
@@ -120,21 +118,7 @@ Repositories that enforce non-author approval on merge requests should extend th
 ```
 
 ### **Renovate Commit Authors**
-The default preset leaves `gitAuthor` unset so GitHub App runs can detect their own commit author. GitHub platform commits use the App's author even when `gitAuthor` is configured; setting a different author in the shared preset prevents Renovate from recognizing those commits when rebasing. Do not set `gitAuthor` or extend the GitLab author preset for GitHub App runs.
-
-GitLab repositories that need the AIPCC CICD Bot author must explicitly extend the GitLab-only preset:
-
-```json
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "github>opendatahub-io/renovate-config",
-    "github>opendatahub-io/renovate-config//gitlab-author"
-  ]
-}
-```
-
-Existing GitLab consumers must add `gitlab-author` before using the updated default preset to retain their previous commit identity. It can be combined with `gitlab-approvals` when needed.
+The default preset retains the AIPCC CICD Bot `gitAuthor` for existing GitLab consumers without requiring a migration. GitHub App platform commits use the App's author instead of the configured `gitAuthor`. The preset lists the observed `aipcc-renovate-bot[bot]` author email in `gitIgnoredAuthors` so Renovate can recognize and rebase those commits without changing the GitLab author. This matches the commit *author*, not GitHub's `noreply@github.com` committer. Verify the author email and rebase behavior in a GitHub App run if the App identity changes; other GitHub Apps are not covered by this exception.
 
 ## Branch Strategies
 

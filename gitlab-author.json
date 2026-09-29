@@ -1,5 +1,0 @@
-{
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "GitLab-only commit author for the AIPCC CICD bot. Do not extend this preset for GitHub App runs.",
-  "gitAuthor": "AIPCC CICD Bot <aipcc-cicd-bot@redhat.com>"
-}
