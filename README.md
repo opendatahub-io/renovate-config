@@ -13,7 +13,6 @@ renovate-config/
 ├── base-images.json                     # Base image update detection
 ├── konflux.json                         # Tool-specific preset
 ├── gitlab-approvals.json                # GitLab approval rules compatibility
-├── github-app.json                      # GitHub App commit identity
 ├── rhaiis/
 │   └── rhaiis.json                        # Product-level presets
 ├── rhel-ai/
@@ -31,7 +30,6 @@ renovate-config/
 - **`base-images.json`** - Base image update detection for teams consuming AIPCC base images from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access`
 - **`konflux.json`** - Konflux CI/CD tooling configurations
 - **`gitlab-approvals.json`** - GitLab approval rules compatibility (use for repos with non-author approval enforcement)
-- **`github-app.json`** - GitHub App platform-commit author autodetection (extend after the default preset)
 
 ### **Product Level**
 - **`rhaiis/rhaiis.json`** - Product level specific configuration for RHAIIS repositories
@@ -120,18 +118,9 @@ Repositories that enforce non-author approval on merge requests should extend th
 ```
 
 ### **Renovate Commit Authors**
-The default preset retains the AIPCC CICD Bot `gitAuthor` for existing GitLab consumers. GitHub App repositories using platform commits should extend the `github-app` preset **after** the default preset to unset that author and let Renovate detect the App's own identity:
+The default preset retains the AIPCC CICD Bot `gitAuthor` for existing GitLab consumers. GitHub App platform commits use the App's author instead, but Renovate 43.268.1 checks branch commit author emails against its configured `gitAuthor` when deciding whether to rebase. The preset lists the observed `aipcc-renovate-bot[bot]` author email in `gitIgnoredAuthors` so repositories already extending the default can rebase App-authored PRs without opting in to another preset. This matches the commit *author*, not GitHub's `noreply@github.com` committer.
 
-```json
-{
-  "extends": [
-    "github>opendatahub-io/renovate-config",
-    "github>opendatahub-io/renovate-config:github-app"
-  ]
-}
-```
-
-The GitHub App repository must adopt this preset; changing this shared configuration alone will not update its existing Renovate configuration. After adoption, rerun Renovate and confirm that the App can rebase its PR. Do not add the App's author to the shared `gitIgnoredAuthors`: that would cause unrelated repositories to treat its commits as unmodified.
+This exact-author exception applies to every default-preset consumer: commits by that same App will be considered bot-owned even if it edited a Renovate branch for another reason. Other authors remain protected. If the App's author identity changes, update the exact email and verify rebasing in a GitHub App run. Previously cached branch-modification results may also require a fresh evaluation before the PR becomes rebaseable.
 
 ## Branch Strategies
 
