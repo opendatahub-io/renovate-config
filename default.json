@@ -21,7 +21,6 @@
   "configMigration": true,
   "onboardingNoDeps": "auto",
   "gitAuthor": "AIPCC CICD Bot <aipcc-cicd-bot@redhat.com>",
-  "gitIgnoredAuthors": ["293192143+aipcc-renovate-bot[bot]@users.noreply.github.com"],
   "ignorePrAuthor": true,
   "rebaseWhen": "behind-base-branch",
   "prConcurrentLimit": 0,
