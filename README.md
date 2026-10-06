@@ -28,8 +28,8 @@ renovate-config/
 - **`base-branches.json`** - Standard branch patterns and enabling rules
 - **`package-rules.json`** - Common package management and automerge rules
 - **`dependency-patterns.json`** - Standard dependency matching patterns
-- **`base-images.json`** - Base image update detection for teams consuming AIPCC base images from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access`
 - **`pypi-packages.json`** - Python package update detection for teams consuming packages from `packages.redhat.com`. Parameterized preset — teams pass the Simple API path (origin is hardcoded)
+- **`base-images.json`** - Base image update detection for teams consuming channel-aware AIPCC base images (e.g. `cuda12.9-torch2.11-el9.8:<timestamp>`) from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access`
 - **`konflux.json`** - Konflux CI/CD tooling configurations
 - **`gitlab-approvals.json`** - GitLab approval rules compatibility (use for repos with non-author approval enforcement)
 
@@ -67,7 +67,7 @@ Container build repositories extend default + containers preset:
 }
 ```
 
-### **Disk Image Repository**  
+### **Disk Image Repository**
 Disk image repositories extend default + disk-images preset:
 
 ```json
@@ -93,8 +93,8 @@ RHAIIS repositories extend default + RHAIIS preset:
 }
 ```
 
-### **Repository Consuming Base Images**
-Repositories that use AIPCC base images from `quay.io/aipcc/base-images`, `registry.redhat.io/rhai`, or `registry.redhat.io/rhai-early-access` extend the base-images preset to get automated update detection:
+### **Repository Consuming Channel-Aware Base Images**
+Repositories that use channel-aware AIPCC base images (with torch version in the image name, e.g. `cuda12.9-torch2.11-el9.8:<timestamp>`) extend the base-images preset to get automated update detection. The preset detects image references in CI variables and Dockerfile/Containerfile `ARG` lines, and uses timestamp-based versioning.
 
 ```json
 {
@@ -105,6 +105,12 @@ Repositories that use AIPCC base images from `quay.io/aipcc/base-images`, `regis
   ]
 }
 ```
+
+Supported image reference patterns:
+- CI variables: `BASE_IMAGE_CUDA: "quay.io/aipcc/base-images/cuda12.9-torch2.11-el9.8:2026090501"`
+- Dockerfile ARGs: `ARG BASE_IMAGE=registry.redhat.io/rhai/base-image-cuda12.9-torch2.11-rhel9:2026090501`
+- Konflux conf files: `BASE_IMAGE_CUDA=quay.io/aipcc/base-images/cuda12.9-torch2.11-el9.8:2026090501`
+- Direct `FROM` lines are handled by Renovate's built-in Dockerfile manager with timestamp versioning applied via package rules
 
 ### **Repository Consuming Python Packages from packages.redhat.com**
 Repositories that consume Python packages from `packages.redhat.com` extend the pypi-packages preset to get automated `requirements.txt` updates when new package versions are published. Pass the Simple API path as a parameter — the path varies by product, version, and platform (e.g. `public-rhai/rhoai/3.5/cpu-ubi9`). The preset hardcodes the `https://packages.redhat.com/api/pypi/` origin:
