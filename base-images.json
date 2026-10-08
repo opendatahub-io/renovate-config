@@ -1,35 +1,37 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "description": "Preset for teams consuming AIPCC base images from quay.io/aipcc/base-images or registry.redhat.io/rhai. Detects base image references in CI configs and container files, and proposes updates using the AIPCC base image versioning scheme.",
+  "description": "Preset for teams consuming channel-aware AIPCC base images. Detects channel-based image references (e.g. cuda12.9-torch2.11-el9.8:<timestamp>) in CI configs and container files, and proposes updates using timestamp-based tagging.",
   "customManagers": [
     {
       "customType": "regex",
       "managerFilePatterns": [
         ".gitlab-ci.yml",
+        ".github/workflows/**",
         "containerfiles/**",
         "**/Containerfile*",
         "**/Dockerfile*",
         "konflux/*.conf"
       ],
       "matchStrings": [
-        "BASE_IMAGE_\\w+:\\s*\"(?<depName>(?:quay\\.io/aipcc/base-images|registry\\.redhat\\.io/rhai(?:-early-access)?)/[^:\"\\s]+):(?<currentValue>[^\"\\s]+)\"",
+        "BASE_IMAGE(?:_\\w+)?:\\s*\"(?<depName>(?:quay\\.io/aipcc/base-images|registry\\.redhat\\.io/rhai(?:-early-access)?)/[^:\"\\s]+):(?<currentValue>[^\"\\s]+)\"",
         "(?:ARG\\s+)?BASE_IMAGE(?:_\\w+)?\\s*=\\s*(?<depName>(?:quay\\.io/aipcc/base-images|registry\\.redhat\\.io/rhai(?:-early-access)?)/[^:\\s]+):(?<currentValue>[^\\s]+)"
       ],
       "datasourceTemplate": "docker",
-      "versioningTemplate": "regex:^(?:base-)?v?(?:(?<major>\\d+)\\.(?<minor>\\d+)(?:\\.(?<patch>\\d+))?(?:-(?:(?:EA|ea)(?:\\.)?(?<prerelease>\\d+)|stable))?[.-])?(?<build>\\d+)$"
+      "versioningTemplate": "regex:^(?:(?<compatibility>.+)-)?(?<major>\\d{8,})$"
     }
   ],
   "packageRules": [
     {
-      "description": "Enable and group AIPCC base image updates",
+      "description": "Enable and group channel-aware AIPCC base image updates",
       "matchDatasources": ["docker"],
       "matchPackageNames": [
-        "quay.io/aipcc/base-images/**",
-        "registry.redhat.io/rhai/base-image-*",
-        "registry.redhat.io/rhai-early-access/base-image-*"
+        "quay.io/aipcc/base-images/*torch*",
+        "registry.redhat.io/rhai/base-image-*torch*",
+        "registry.redhat.io/rhai-early-access/base-image-*torch*"
       ],
+      "versioning": "regex:^(?:(?<compatibility>.+)-)?(?<major>\\d{8,})$",
       "enabled": true,
-      "groupName": "base-image",
+      "groupName": "channel-base-images",
       "ignoreUnstable": false
     }
   ]
