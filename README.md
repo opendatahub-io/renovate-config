@@ -193,7 +193,7 @@ Repository Config = Root + Product + Component + Custom Rules(set in individual 
 ```
 
 ### **Minimal Duplication**
-- Complex custom managers live in individual repositories
+- Repository-specific custom managers live in individual repositories; patterns shared by every repository (for example the central-linter lint template include) live in the preset
 - Shared presets contain only truly common patterns
 - Easy to customize without breaking shared functionality
 

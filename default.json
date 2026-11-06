@@ -92,5 +92,15 @@
         "rebaseWhen": "behind-base-branch"
       }
     ]
-  }
+  },
+  "customManagers": [
+    {
+      "description": "central-linter: bump the shared lint template include tag",
+      "customType": "regex",
+      "managerFilePatterns": ["/(^|/)\\.gitlab-ci\\.yml$/", "/(^|/)ci/checks\\.yml$/"],
+      "matchStrings": ["github\\.com/opendatahub-io/central-linter/raw/(?<currentValue>v\\d+\\.\\d+\\.\\d+)/templates"],
+      "datasourceTemplate": "github-releases",
+      "depNameTemplate": "opendatahub-io/central-linter"
+    }
+  ]
 }
